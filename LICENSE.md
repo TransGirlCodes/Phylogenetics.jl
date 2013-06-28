@@ -1,4 +1,4 @@
-Darwin.jl is licensed under the MIT License:
+Phylo.jl is licensed under the MIT License:
 
 > Copyright (c) 2013: Benjamin J. Ward and other contributors.
 >
