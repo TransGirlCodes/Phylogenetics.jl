@@ -14,8 +14,8 @@ module Phylo
 		getKids
 
 	## Load Package Files
-	include(Pkg.dir("Jape", "src", "typedefs.jl"))
-	include(Pkg.dir("Jape", "src", "treeio.jl"))
+	include(Pkg.dir("Phylo", "src", "typedefs.jl"))
+	include(Pkg.dir("Phylo", "src", "treeio.jl"))
 
 end
 
