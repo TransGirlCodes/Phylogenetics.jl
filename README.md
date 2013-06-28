@@ -1,5 +1,5 @@
 Phylo
-====
+=====
 Version 0.0.0
 
 **The Julia package for Analysis of Phylogeny and Evolution**
@@ -14,8 +14,20 @@ Pkg.add("Phylo") # Install Phylo.jl
 using Phylo # to use Phylo
 ```
 
-# Features (So far)
+# Features (so far...)
 
+* Types for Phylogenies
+  * Abstract type "Phylogeny".
+  * Type for Cladograms (trees without branch lengths) "Clado".
+  * Type for phylogenetic trees with branch lengths "Phylo".
+  * Type for reduced representation of trees as an array of indicies "ReducedTopology".
+* Methods for reading in data from Newick format tree files.
+  * Interprets information present in the newick tree and makes a Phylo or Clado type respectively. 
+* Methods for writing out Phylo and Clado types as Newick format trees to file.
+* Methods for manipulating Trees.
+  * Find the root of the tree.
+  * Display the children of every tree node.
+		
 
 Contributing
 ------------
