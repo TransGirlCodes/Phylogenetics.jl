@@ -20,4 +20,4 @@ using Phylo # to use Phylo
 Contributing
 ------------
 
-**Fork and send a pull request or create a [GitHub issue](https://github.com/Ward9250/Darwin.jl/issues) for bug reports or feature requests.  Or if you created the feature you wanted put in a pull request!**
+**Fork and send a pull request or create a [GitHub issue](https://github.com/Ward9250/Phylo.jl/issues) for bug reports or feature requests.  Or if you created the feature you wanted put in a pull request!**
