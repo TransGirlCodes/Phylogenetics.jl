@@ -1,29 +1,46 @@
 # Function for reading in a tree from file.
-function TreeRead(filepath::ASCIIString, format="nwk")
+function TreeRead(filepath::ASCIIString)
 	instream = open(expanduser(filepath))
 	instring = readall(instream)
 	close(instream)
-	trees = split(instring, ';')
-	trees = [replace(i, r"(\r|\n|\s)", "") for i in trees] 
-	trees = trees[bool([length(t) > 0 for t in trees])]
-	if length(trees) == 1
-		if search(trees[1], ":") == 0:-1
-			tree = CladoBuild(trees[1])
-			return tree
-		elseif search(trees[1], ":") != 0:-1
-			tree = TreeBuild(trees[1])
+	if search(instring, ";") != 0:-1 && search(instring, "(") != 0:-1 && search(instring, "(")
+		trees = split(instring, ';')
+		trees = [replace(i, r"(\r|\n|\s)", "") for i in trees]
+		trees = trees[bool([t != "" for t in trees])]
+		if length(trees) == 1
+			if search(trees[1], ":") == 0:-1
+				tree = CladoBuild(trees[1])
+				return tree
+			elseif search(trees[1], ":") != 0:-1
+				tree = TreeBuild(trees[1])
+				return tree
+			end
+		end
+		outputTrees = Array(Phylogeny, length(trees))
+		for i in 1:length(trees)
+			if search(trees[i], ":") == 0:-1
+				outputTrees[i] = CladoBuild(trees[i])
+			elseif search(trees[i], ":") != 0:-1
+				outputTrees[i] = TreeBuild(trees[i])
+			end
+		end
+		return outputTrees
+	elseif search(instring, "phyloxml") != 0:-1 && search(instring,"<") != 0:-1 && search(instring, ">")
+		println("phyloXML features in development...")
+		instring = replace(instring, r"<phyloxml.*>", "")
+		trees = split(instring, "</phylogeny>")
+		trees = [replace(i, r"(\r|\n|\s)", "") for i in trees]
+		trees = trees[bool([t != "" for t in trees])]
+		if length(trees) == 1
+			tree = phyxbuild(trees[1])
 			return tree
 		end
-	end
-	outputTrees = Array(Phylogeny, length(trees))
-	for i in 1:length(trees)
-		if search(trees[i], ":") == 0:-1
-			outputTrees[i] = CladoBuild(trees[i])
-		elseif search(trees[i], ":") != 0:-1
-			outputTrees[i] = TreeBuild(trees[i])
+		outputTrees = Array(PhyloX, length(trees))
+		for i in 1:length(trees)
+			outputTrees[i] = phyxbuild(trees[i])
 		end
+		return outputTrees
 	end
-	return outputTrees
 end
 
 

@@ -23,6 +23,7 @@ type Clado <: Phylogeny
 	Clado(name::ASCIIString, edge::Array{Int}, tipLabel::Array{ASCIIString}, Nnode::Int, nodeLabel::Array{String}) = new(name, edge, tipLabel, Nnode, nodeLabel)
 end
 
+
 # Type definition for a small simple representation of a tree. 
 type ReducedTopology <: Phylogeny
 	name::ASCIIString
