@@ -14,7 +14,7 @@ Pkg.add("Phylo") # Install Phylo.jl
 using Phylo # to use Phylo
 ```
 
-# Features (so far...)
+# Features
 
 * Types for Phylogenies
   * Abstract type "Phylogeny".
@@ -27,6 +27,12 @@ using Phylo # to use Phylo
 * Methods for manipulating Trees.
   * Find the root of the tree.
   * Display the children of every tree node.
+  
+# Features in Development / Requested
+
+* Support for reading in phyloXML files (in branch phyxml).
+  * A type for trees annotated with highly detailed information. 
+  * Methods for converting the planned type with already existing types Clado, Phylo, and ReducedTopology.
 		
 
 Contributing
