@@ -9,9 +9,9 @@ This package has not yet been added to the Julia metadata and package system. I 
 ```
 Pkg.init() # Only the first time you install a Julia's Package
 
-Pkg.add("Phylo") # Install Phylo.jl
+Pkg.add("Phylogenetics") # Install Phylogenetics.jl
 
-using Phylo # to use Phylo
+using Phylogenetics # to use Phylogenetics
 ```
 
 # Features
@@ -38,4 +38,4 @@ using Phylo # to use Phylo
 Contributing
 ------------
 
-**Fork and send a pull request or create a [GitHub issue](https://github.com/Ward9250/Phylo.jl/issues) for bug reports or feature requests.  Or if you created the feature you wanted put in a pull request!**
+**Fork and send a pull request or create a [GitHub issue](https://github.com/Ward9250/Phylo.jl/issues) for bug reports or feature requests.  Or if you created the feature you wanted put in a pull request! Request pulls to devel branch to keep master more stable and give time to find bugs before merge with master branch.**
