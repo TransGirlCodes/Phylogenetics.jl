@@ -26,7 +26,6 @@ function TreeRead(filepath::ASCIIString)
 		end
 		return outputTrees
 	elseif search(instring, "phyloxml") != 0:-1 && search(instring,"<") != 0:-1 && search(instring, ">")
-		println("phyloXML features in development...")
 		instring = replace(instring, r"<phyloxml.*>", "")
 		trees = split(instring, "</phylogeny>")
 		trees = [replace(i, r"(\r|\n|\s)", "") for i in trees]
@@ -42,6 +41,15 @@ function TreeRead(filepath::ASCIIString)
 		return outputTrees
 	end
 end
+
+
+function phyxbuild(input::ASCIIString)
+	inputArray = split(input, r"><")
+	inputArray = ["<$i>" for i in inputArray]
+end
+
+
+
 
 
 
