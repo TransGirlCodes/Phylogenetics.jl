@@ -26,9 +26,11 @@ function TreeRead(filepath::ASCIIString)
 		end
 		return outputTrees
 	elseif search(instring, "phyloxml") != 0:-1 && search(instring,"<") != 0:-1 && search(instring, ">")
+		# Lets first sort out all the trees present in the file.
 		instring = replace(instring, r"<phyloxml.*>", "")
+		instring = replace(instring, r"</phyloxml>", "")
 		trees = split(instring, "</phylogeny>")
-		trees = [replace(i, r"(\r|\n|\s)", "") for i in trees]
+		trees = [replace(i, r"(\r|\n)", "") for i in trees]
 		trees = trees[bool([t != "" for t in trees])]
 		if length(trees) == 1
 			tree = phyxbuild(trees[1])
@@ -43,9 +45,21 @@ function TreeRead(filepath::ASCIIString)
 end
 
 
+
 function phyxbuild(input::ASCIIString)
-	inputArray = split(input, r"><")
+	# first let's tidy up the input. Let's split each segment into it's own array element.
+	inputArray = split(input, r">\s*<")
 	inputArray = ["<$i>" for i in inputArray]
+	inputArray = [replace(i, r"\s{4}", "") for i in inputArray]
+	inputArray = [replace(i, "<<", "<") for i in inputArray]
+	inputArray = [replace(i, ">>", ">") for i in inputArray]
+	nClades = sum(inputArray .== "<clade>")
+	nClades == sum(inputArray .== "</clade>")
+	i = 0
+	j = 0
+	openNode = 1
+	for n in inputArray
+		if n == 
 end
 
 
