@@ -47,7 +47,14 @@ end
 
 
 function phyxbuild(input::ASCIIString)
-	# first let's tidy up the input. Let's split each segment into it's own array element.
+	function processphylogeny(r, element)
+		if ismatch(r"rooted=\"true\"", element)
+			r = true
+		end
+
+
+	end
+	# First let's tidy up the input. Let's split each segment into it's own array element.
 	inputArray = split(input, r">\s*<")
 	inputArray = ["<$i>" for i in inputArray]
 	inputArray = [replace(i, r"\s{4}", "") for i in inputArray]
@@ -55,11 +62,29 @@ function phyxbuild(input::ASCIIString)
 	inputArray = [replace(i, ">>", ">") for i in inputArray]
 	nClades = sum(inputArray .== "<clade>")
 	nClades == sum(inputArray .== "</clade>")
-	i = 0
-	j = 0
-	openNode = 1
+	structure = zeros(Int, nClades)
+	rooted::Bool = false
+	rerootable::Bool = false
+	features = Array(Array{ASCIIString}, nClades)
+	features = fill!(features, [""])
+	# Fathom the struture of the tree and get features from it...
+	node = 0
+	clademax = 0
 	for n in inputArray
-		if n == 
+		if ismatch(r"<clade>", n) 
+			node += 1
+			clademax += 1
+			structure[clademax] = node - 1
+		elseif ismatch(r"</clade>", n)
+			node -= 1
+		elseif node > 0
+			features[node] = [features[node], n]
+		end
+	end
+
+
+
+
 end
 
 
