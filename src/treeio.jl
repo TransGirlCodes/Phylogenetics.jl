@@ -47,14 +47,7 @@ end
 
 
 function phyxbuild(input::ASCIIString)
-	function processphylogeny(r, element)
-		if ismatch(r"rooted=\"true\"", element)
-			r = true
-		end
-
-
-	end
-	# First let's tidy up the input. Let's split each segment into it's own array element.
+	# First let's sort the input. Let's split each segment into it's own array element.
 	inputArray = split(input, r">\s*<")
 	inputArray = ["<$i>" for i in inputArray]
 	inputArray = [replace(i, r"\s{4}", "") for i in inputArray]
@@ -70,21 +63,33 @@ function phyxbuild(input::ASCIIString)
 	# Fathom the struture of the tree and get features from it...
 	node = 0
 	clademax = 0
+	# First bash at a prototype phyxml parsing loop.
 	for n in 1:length(inputArray)
 		x = inputArray[n]
 		if ismatch(r"<clade>", x) 
-			node += 1
 			clademax += 1
-			structure[clademax] = node - 1
+			structure[clademax] = node
+			node = clademax
 		elseif ismatch(r"</clade>", x)
-			node -= 1
+			node = structure[clademax]
 		elseif node > 0
-			features[clademax] = [features[clademax], x]
+			features[node] = [features[node], x]
 		end
 	end
+	features = [n[bool([i != "" for i in n])] for n in features]
+	# Got the structure and features divvied out to appropriate nodes. Now we need to deal with these features.
+	edge = hcat(structure, [1:nClades])
+	ind = [findin(structure, i) for i in [1,2,3,4,5]]
+	tips = [1:nClades][[i == [] for i in ind]]
+	for i in tips
+		processtips()
 
-	# Fathom the structure of the tree and get features from it...
+
+
 	
+
+
+
 
 
 
