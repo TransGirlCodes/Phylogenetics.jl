@@ -70,18 +70,21 @@ function phyxbuild(input::ASCIIString)
 	# Fathom the struture of the tree and get features from it...
 	node = 0
 	clademax = 0
-	for n in inputArray
-		if ismatch(r"<clade>", n) 
+	for n in 1:length(inputArray)
+		x = inputArray[n]
+		if ismatch(r"<clade>", x) 
 			node += 1
 			clademax += 1
 			structure[clademax] = node - 1
-		elseif ismatch(r"</clade>", n)
+		elseif ismatch(r"</clade>", x)
 			node -= 1
 		elseif node > 0
-			features[node] = [features[node], n]
+			features[clademax] = [features[clademax], x]
 		end
 	end
 
+	# Fathom the structure of the tree and get features from it...
+	
 
 
 
