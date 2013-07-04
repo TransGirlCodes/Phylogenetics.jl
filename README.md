@@ -1,6 +1,6 @@
-Phylo
+Phylogenetics
 =====
-Version 0.0.0
+Version 0.0.1
 
 **The Julia package for Analysis of Phylogeny and Evolution**
 
@@ -9,9 +9,9 @@ This package has not yet been added to the Julia metadata and package system. I 
 ```
 Pkg.init() # Only the first time you install a Julia's Package
 
-Pkg.add("Phylo") # Install Phylo.jl
+Pkg.add("Phylogenetics") # Install Phylogenetics.jl
 
-using Phylo # to use Phylo
+using Phylogenetics # to use Phylogenetics
 ```
 
 # Features (so far...)

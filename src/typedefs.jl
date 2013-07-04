@@ -44,3 +44,13 @@ function ReducedTopology(phy::Array{Phylogeny})
 	end
 	return outarray
 end
+
+type PhyXTree
+	name::ASCIIString
+	structure::Array{Int}
+	tipNodes::Array{Int}
+	internalNodes::Array{Int}
+end
+
+type PhyXTip
+	

@@ -47,6 +47,18 @@ end
 
 
 function phyxbuild(input::ASCIIString)
+	function processtips(tip, features, nodes, structure)
+		string = "$features"
+		string = replace(string, r"[\\\"\[\],]", "")
+		m = match(r"<id provider=[^<]*>", string)
+		if m != nothing
+			s = match(r"=.+>", m.match)
+			taxonomyIdProvider = s.match[2:length(s.match)-1]
+		end
+		
+
+		
+	end
 	# First let's sort the input. Let's split each segment into it's own array element.
 	inputArray = split(input, r">\s*<")
 	inputArray = ["<$i>" for i in inputArray]
@@ -56,8 +68,8 @@ function phyxbuild(input::ASCIIString)
 	nClades = sum(inputArray .== "<clade>")
 	nClades == sum(inputArray .== "</clade>")
 	structure = zeros(Int, nClades)
-	rooted::Bool = false
-	rerootable::Bool = false
+	rooted = false
+	rerootable = false
 	features = Array(Array{ASCIIString}, nClades)
 	features = fill!(features, [""])
 	# Fathom the struture of the tree and get features from it...
@@ -81,8 +93,10 @@ function phyxbuild(input::ASCIIString)
 	edge = hcat(structure, [1:nClades])
 	ind = [findin(structure, i) for i in [1,2,3,4,5]]
 	tips = [1:nClades][[i == [] for i in ind]]
-	for i in tips
-		processtips()
+	nodes = [1:nClades][[i != [] for i in ind]]
+	newNodes = [length(tips) + i for i in 1:length(nodes)]
+	tipNodes = [processtips(tips[i], features[tips[i]], nodes, structure) for i in 1:length(tips)]
+		
 
 
 
