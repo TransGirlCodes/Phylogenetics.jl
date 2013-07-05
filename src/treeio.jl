@@ -469,8 +469,12 @@ function writenewick(phy::Phylo, name)
 end
 
 
-# Macros for making a tree from a string.
+# Macro for making a tree from a string.
 macro tr_str(s)
+	s = replace(s, r"(\r|\n|\s)", "")
+	if search(s, ";") != 0:-1
+		s = s[1:length(s)-1]
+	end
 	if search(s, ":") == 0:-1
 		tree = CladoBuild(s)
 		return tree
