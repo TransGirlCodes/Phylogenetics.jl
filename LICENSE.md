@@ -1,4 +1,4 @@
-Phylo.jl is licensed under the MIT License:
+Phylogenetics.jl is licensed under the MIT License:
 
 > Copyright (c) 2013: Benjamin J. Ward and other contributors.
 >
