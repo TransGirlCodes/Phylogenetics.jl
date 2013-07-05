@@ -1,4 +1,4 @@
-module Phylo
+module Phylogenetics
 	## Dependencies
 	using Base.Intrinsics
 	importall Base
@@ -14,8 +14,8 @@ module Phylo
 		getKids
 
 	## Load Package Files
-	include(Pkg.dir("Phylo", "src", "typedefs.jl"))
-	include(Pkg.dir("Phylo", "src", "treeio.jl"))
+	include(Pkg.dir("Phylogenetics", "src", "typedefs.jl"))
+	include(Pkg.dir("Phylogenetics", "src", "treeio.jl"))
 
 end
 
