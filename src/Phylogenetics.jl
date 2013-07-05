@@ -11,7 +11,8 @@ module Phylogenetics
 		TreeRead,
 		treeWrite,
 		getRoot,
-		getKids
+		getKids,
+		@tr_str
 
 	## Load Package Files
 	include(Pkg.dir("Phylogenetics", "src", "typedefs.jl"))
