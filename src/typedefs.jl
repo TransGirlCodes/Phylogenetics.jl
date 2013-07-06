@@ -45,12 +45,34 @@ function ReducedTopology(phy::Array{Phylogeny})
 	return outarray
 end
 
+# Definition of PhyXTree and it's elements.
 type PhyXTree
 	name::ASCIIString
 	structure::Array{Int}
 	tipNodes::Array{Int}
 	internalNodes::Array{Int}
+	userData::Array{Array}
 end
 
-type PhyXTip
+# Definition for the clade elements 
+type PhyXTaxonomy
+	scientificName::ASCIIString
+	provider::ASCIIString
+	id::ASCIIString
+end
+
+type PhyXSequence
+	database::ASCIIString
+	accession::ASCIIString
+	symbol::ASCIIString
+	molSeq::ASCIIString
+end
+
+type PhyXClade
+	taxonomy::PhyXTaxonomy
+	sequence::PhyXSequence
+end
+
+
+
 	
