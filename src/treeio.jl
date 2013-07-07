@@ -26,156 +26,68 @@ function TreeRead(filepath::ASCIIString)
 		end
 		return outputTrees
 	elseif search(instring, "phyloxml") != 0:-1 && search(instring,"<") != 0:-1 && search(instring, ">")
-		# Lets first sort out all the trees present in the file.
-		instring = replace(instring, r"<phyloxml.*>", "")
-		instring = replace(instring, r"</phyloxml>", "")
-		trees = split(instring, "</phylogeny>")
-		trees = [replace(i, r"(\r|\n)", "") for i in trees]
-		trees = trees[bool([t != "" for t in trees])]
-		if length(trees) == 1
-			tree = phyxbuild(trees[1])
-			return tree
-		end
-		outputTrees = Array(PhyloX, length(trees))
-		for i in 1:length(trees)
-			outputTrees[i] = phyxbuild(trees[i])
-		end
-		return outputTrees
+		# # Lets first sort out all the trees present in the file.
+		# instring = replace(instring, r"<phyloxml.*>", "")
+		# instring = replace(instring, r"</phyloxml>", "")
+		# trees = split(instring, "</phylogeny>")
+		# trees = [replace(i, r"(\r|\n)", "") for i in trees]
+		# trees = trees[bool([t != "" for t in trees])]
+		# if length(trees) == 1
+		# 	tree = phyxbuild(trees[1])
+		# 	return tree
+		# end
+		# outputTrees = Array(PhyloX, length(trees))
+		# for i in 1:length(trees)
+		# 	outputTrees[i] = phyxbuild(trees[i])
+		# end
+		# return outputTrees
 	end
 end
 
 
 
-function phyxbuild(input::ASCIIString)
-	function processtips(tip, feat, nodes, structure)
-		string = "$feat"
-		string = replace(string, r"[\\\"\[\],]", "")
-		# Process taxonomy information for the tip.
-		provider, id, scientificName, rank = processtaxonomy(string)
-		# Process sequence information for the tip. 
-		database, accession, sequencename, molseq, symbol = processsequence(string)
 
-		
-		
-
-		
-	end
-
-	function processtaxonomy(s::ASCIIString)
-		taxonomystring = match(r"<taxonomy>.*</taxonomy>", s)
-		if taxonomystring != nothing
-			idstring = match(r"<id.*</id>", taxonomystring.match)
-			if idstring != nothing
-				provider = match(r"(?<=<id provider=)[^<]+(?=>)", idstring.match)
-				provider = provider != nothing ? provider.match : ""
-				id = match(r"(?<=>).+(?=<)", idstring.match)
-				id = id != nothing ? id.match : ""
-			else
-				provider = ""
-				id = ""
-			end
-			scientificname = match(r"(?<=<scientific_name>)[A-Za-z\s]+(?=</scientific_name>)", taxonomystring.match)
-			scientificname = scientificname != nothing ? scientificname.match : ""
-			rank = match(r"(?<=<rank>)[A-Za-z](?=</rank)")
-			rank = rank != nothing ? nothing.match : ""
-
-
-			return provider, id, scientificname, rank
-		end
-		
-	end
-
-
-
-
-	function processsequence(s::ASCIIString)
-		sequencesstring = match(r"<sequence>.*</sequence>", s)
-		if sequencesstring != nothing
-			accessionstring = match(r"<accession.*</accession>", sequencesstring.match)
-			if accessionstring != nothing
-				database = match(r"(?<=<accession source=)[^<]+(?=>)", accessionstring.match)
-				database = database  != nothing ? database.match : ""
-				accession = match(r"(?<=>)[A-Za-z0-9]+(?=</accession>)", accessionstring.match)
-				accession = accession != nothing ? accession.match : ""
-			else
-				database = ""
-				accession = ""
-			end
-			sequencename = match(r"(?<=<name>)[^<>]+(?=</name>)", sequencesstring.match)
-			sequencename = sequencename != nothing ? sequencename.match : ""
-			molseq = match(r"(?<=<mol_seq>)[A-IK-Z\*\-](?=</mol_seq>)", sequencesstring.match)
-			molseq = molseq != nothing ? molseq.match : ""
-			symbol = match(r"(?<=<symbol>)[^<>](?=</symbol>)")
-			symbol = symbol != nothing ? symbol.match : ""
-		end
-		return database, accession, sequencename, molseq, symbol
-	end
-
-
-
-	function processclade(s::ASCIIString)
-		cladestring = match(r"<clade[<>]*>", s)
-		if cladestring != nothing
-			# TODO
-		end
-	end
-
-
-
-
-
-
-
-	# First let's sort the input. Let's split each segment into it's own array element.
-	inputArray = split(input, r">\s*<")
-	inputArray = ["<$i>" for i in inputArray]
-	inputArray = [replace(i, r"\s{4}", "") for i in inputArray]
-	inputArray = [replace(i, "<<", "<") for i in inputArray]
-	inputArray = [replace(i, ">>", ">") for i in inputArray]
-	nClades = sum(inputArray .== "<clade>")
-	nClades == sum(inputArray .== "</clade>")
-	structure = zeros(Int, nClades)
-	rooted = false
-	rerootable = false
-	features = Array(Array{ASCIIString}, nClades)
-	features = fill!(features, [""])
-	# Fathom the struture of the tree and get features from it...
-	node = 0
-	clademax = 0
-	# First bash at a prototype phyxml parsing loop.
-	for n in 1:length(inputArray)
-		x = inputArray[n]
-		if ismatch(r"<clade[^<>]*>", x) 
-			clademax += 1
-			structure[clademax] = node
-			node = clademax
-			features[node] = [features[node], x]
-		elseif ismatch(r"</clade>", x)
-			node = structure[clademax]
-		elseif node > 0
-			features[node] = [features[node], x]
-		end
-	end
-	features = [n[bool([i != "" for i in n])] for n in features]
-	# Got the structure and features divvied out to appropriate nodes. Now we need to deal with these features.
-	edge = hcat(structure, [1:nClades])
-	ind = [findin(structure, i) for i in [1,2,3,4,5]] # Figure which nodes have kids.
-	tips = [1:nClades][[i == [] for i in ind]] # Tip nodes should have no kids.
-	nodes = [1:nClades][[i != [] for i in ind]] # Internal nodes should have kids.
-	newNodes = [length(tips) + i for i in 1:length(nodes)]
-	tipNodes = [processtips(tips[i], features[tips[i]], nodes, structure) for i in 1:length(tips)]
-		
-
-
-
-	
-
-
-
-
-
-
-end
+# # Redundant and destined for deletion, once new code is finished.
+# function xmlread(args)
+# 	# First let's sort the input. Let's split each segment into it's own array element.
+# 	inputArray = split(input, r">\s*<")
+# 	inputArray = ["<$i>" for i in inputArray]
+# 	inputArray = [replace(i, r"\s{4}", "") for i in inputArray]
+# 	inputArray = [replace(i, "<<", "<") for i in inputArray]
+# 	inputArray = [replace(i, ">>", ">") for i in inputArray]
+# 	nClades = sum(inputArray .== "<clade>")
+# 	nClades == sum(inputArray .== "</clade>")
+# 	structure = zeros(Int, nClades)
+# 	rooted = false
+# 	rerootable = false
+# 	features = Array(Array{ASCIIString}, nClades)
+# 	features = fill!(features, [""])
+# 	# Fathom the struture of the tree and get features from it...
+# 	node = 0
+# 	clademax = 0
+# 	# First bash at a prototype phyxml parsing loop.
+# 	for n in 1:length(inputArray)
+# 		x = inputArray[n]
+# 		if ismatch(r"<clade[^<>]*>", x) 
+# 			clademax += 1
+# 			structure[clademax] = node
+# 			node = clademax
+# 			features[node] = [features[node], x]
+# 		elseif ismatch(r"</clade>", x)
+# 			node = structure[clademax]
+# 		elseif node > 0
+# 			features[node] = [features[node], x]
+# 		end
+# 	end
+# 	features = [n[bool([i != "" for i in n])] for n in features]
+# 	# Got the structure and features divvied out to appropriate nodes. Now we need to deal with these features.
+# 	edge = hcat(structure, [1:nClades])
+# 	ind = [findin(structure, i) for i in [1,2,3,4,5]] # Figure which nodes have kids.
+# 	tips = [1:nClades][[i == [] for i in ind]] # Tip nodes should have no kids.
+# 	nodes = [1:nClades][[i != [] for i in ind]] # Internal nodes should have kids.
+# 	newNodes = [length(tips) + i for i in 1:length(nodes)]
+# 	tipNodes = [processtips(tips[i], features[tips[i]], nodes, structure) for i in 1:length(tips)]
+# end
 
 
 

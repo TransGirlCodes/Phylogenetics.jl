@@ -54,25 +54,57 @@ type PhyXTree
 	userData::Array{Array}
 end
 
-# Definition for the clade elements 
-type PhyXTaxonomy
-	scientificName::ASCIIString
+# Definition for the clade elements.
+
+
+# Definitions for the clade variables
+# Type containing the taxonomy information for a clade element.
+type CladeTaxonomy
 	provider::ASCIIString
-	id::ASCIIString
+	taxonomyID::ASCIIString
+	taxonomyCode::ASCIIString
+	taxonomyAuthority::ASCIIString
+	scientificName::ASCIIString
+	commonName::Array{String}
+	synonym::Array{String}
+	rank::ASCIIString
+	uriType::ASCIIString
+	uriDesc::ASCIIString
+	uri::ASCIIString
 end
 
-type PhyXSequence
+
+
+
+
+type CladeSequence
 	database::ASCIIString
 	accession::ASCIIString
+	name::ASCIIString
 	symbol::ASCIIString
-	molSeq::ASCIIString
+	molSeq::MolSeq
+	binarySeq::ASCIIString
 end
 
 type PhyXClade
+	cladeID::ASCIIString
 	taxonomy::PhyXTaxonomy
 	sequence::PhyXSequence
+	events::CladeEvents
+end
+
+type CladeEvents
+	speciations::Int
 end
 
 
+
+
+
+
+type MolSeq
+	aligned::Bool
+	sequence::ASCIIString
+end
 
 	
