@@ -58,7 +58,34 @@ end
 
 
 # Definitions for the clade variables
-# Type containing the taxonomy information for a clade element.
+# Type containing user defined properties.
+type Property
+	attrRef::ASCIIString
+	attrUnit::ASCIIString
+	attrDatatype::ASCIIString
+	attrAppliesto::ASCIIString
+	attrIdRef::ASCIIString
+	value
+end
+# Type containing the confidence measure for a given clade feature.
+type Confidence
+	attrType::ASCIIString 
+	value::Float64
+end
+# Type containing the uri information used in other types that clades contain.
+type Uri
+	attrDesc::ASCIIString
+	attrType::ASCIIString
+	string::ASCIIString
+	Uri(a::ASCIIString,b::ASCIIString,c::ASCIIString) = new(a,b,c)
+end
+# Type containing the taxonomyID information for a clade taxonomy element.
+type TaxonomyID
+	provider::ASCIIString
+	id::ASCIIString
+	TaxonomyID(a::ASCIIString,b::ASCIIString) = new(a,b)
+end
+# Type containing taxonomy information for a Clade element.
 type CladeTaxonomy
 	attrIdSource::ASCIIString
 	id::TaxonomyID
@@ -69,53 +96,19 @@ type CladeTaxonomy
 	synonym::Array{String}
 	rank::ASCIIString
 	uri::Uri
+	CladeTaxonomy(idsource::ASCIIString,id::TaxonomyID,code::ASCIIString,auth::ASCIIString,sname::ASCIIString,cname::Array{String},syn::Array{String},rank::ASCIIString,uri::Uri) = new(idsource,id,code,auth,sname,cname,syn,rank,uri)
 end
-type TaxonomyID
-	provider::ASCIIString
-	id::ASCIIString
-end
-
-# Type containing the uri information used in other types that clades contain.
-type Uri
-	attrDesc::ASCIIString
-	attrType::ASCIIString
-	string::ASCIIString
-end
-
-# Type containing the event information for any given clade.
-type CladeEvents
-	eventType::ASCIIString
-	duplications::Int32
-	speciations::Int32
-	losses::Int32
-	confidence::Confidence
-end
-
-# Type containing the confidence measure for a given clade feature.
-type Confidence
-	attrType::ASCIIString # The type of confidence value e.g. probability/bootstrap.
-	value::Float64 # The actual value as a floating point number.
-end
-
-# Type and subtypes containing the sequence information for clades.
-type CladeSequence
-	attrType::ASCIIString
-	accession::SeqAccession
-	name::ASCIIString
-	symbol::ASCIIString
-	molSeq::MolSeq
-	uri::Uri
-	annotations::Array{SeqAnnotation}
-	domainArchitecture::Array{}
-end
-type MolSeq
-	aligned::Bool
-	sequence::ASCIIString
-end
+# Type containing accession ifnroamtion for a sequence.
 type SeqAccession
 	source::ASCIIString
 	accession::ASCIIString
 end
+# Type containing the molecular sequence.
+type MolSeq
+	aligned::Bool
+	sequence::ASCIIString
+end
+# Type containing the information for a given annotation.
 type SeqAnnotation
 	attrRef::ASCIIString
 	attrSource::ASCIIString
@@ -127,15 +120,58 @@ type SeqAnnotation
 	properties::Array{Property}
 end
 
-# Type containing user defined properties.
-type Property
-	attrRef::ASCIIString
-	attrUnit::ASCIIString
-	attrDatatype::ASCIIString
-	attrAppliesto::ASCIIString
-	attrIdRef::ASCIIString
-	value
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Type containing the event information for any given clade.
+type CladeEvents
+	eventType::ASCIIString
+	duplications::Int32
+	speciations::Int32
+	losses::Int32
+	confidence::Array{Confidence}
 end
+
+
+
+# Type and subtypes containing the sequence information for clades.
+
+
+type CladeSequence
+	attrType::ASCIIString
+	accession::SeqAccession
+	name::ASCIIString
+	symbol::ASCIIString
+	molSeq::MolSeq
+	uri::Uri
+	annotations::Array{SeqAnnotation}
+	domainArchitecture::DomainArchitecture
+	CladeSequence(atype::ASCIIString, acc::SeqAccession, name::ASCIIString, symb::ASCIIString, mol::MolSeq, uri::Uri, ann::Array{SeqAnnotation}, dom::DomainArchitecture) = new(atype, acc, name, symb, mol, uri, ann, dom)
+end
+
+
+
+
+
 
 
 
@@ -158,7 +194,18 @@ type CladeColour
 	blue::Float64
 end
 
+type DomainArchitecture
+	attrLength::Int64
+	domains::Array{Domain}
+end
 
+type Domain
+	attrFrom
+	attrTo
+	attrConfidence
+	attrId
+
+end
 
 
 type PhyXClade

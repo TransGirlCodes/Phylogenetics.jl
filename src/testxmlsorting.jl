@@ -2,7 +2,7 @@
 
 
 using LibExpat
-filepath = "~/Desktop/phyxml2"
+filepath = "~/Desktop/apaf-1.xml"
 instream = open(expanduser(filepath))
 instring = readall(instream)
 close(instream)
@@ -30,6 +30,16 @@ end
 
 
 function buildphyx(tree)
+	function process_uri(instr)
+		uritype = instr[xpath"uri/@type"]
+		uridesc = instr[xpath"uri/@desc"]
+		uri = instr[xpath"uri/text()"]
+		uritype = length(uritype) > 0 ? uritype[1] : ""
+		uridesc = length(uridesc) > 0 ? uridesc[1] : ""
+		uri = length(uri) > 0 ? uri[1] : ""
+		outUri = Uri(uridesc, uritype, uri)
+		return outUri
+	end
 	function process_taxonomy(inclade)
 		# Extract the values out of the elements.
 		taxonomies = inclade[xpath"taxonomy"]
@@ -60,29 +70,18 @@ function buildphyx(tree)
 		end
 		return outTaxonomies
 	end
+
+
+
+
 	function process_confidence(instr)
-		confidences = instr[xpath"confidence"]
-		outConfidences = Array(Confidence, length(confidence))
-		for i in 1:length(confidences)
-			conf = confidences[i]
-			confidence = float64(conf[xpath"text()"])
-			confidenceType = conf[xpath"@type"]
-			confidence = length(confidence) > 0 ? confidence[1] : 0.0
-			confidenceType = length(confidenceType) > 0 ? confidenceType[1] : ""
-			outConfidences[i] = Confidence(confidenceType, confidence)
-		end
-		return outConfidences
+		confidence = instr[xpath"number()"]
+		confidenceType = instr[xpath"@type"]
+		confidenceType = length(confidenceType) > 0 ? confidenceType[1] : ""
+		outConfidence = Confidence(confidenceType, confidence)
+		return outConfidence
 	end
-	function process_uri(instr)
-		uritype = instr[xpath"uri/@type"]
-		uridesc = instr[xpath"uri/@desc"]
-		uri = seq[xpath"uri/text()"]
-		uritype = length(uritype) > 0 ? uritype[1] : ""
-		uridesc = length(uridesc) > 0 ? uridesc[1] : ""
-		uri = length(uri) > 0 ? uri[1] : ""
-		outUri = Uri(uridesc, uritype, uri)
-		return outUri
-	end
+	
 	function process_events(inclade)
 		# Get the values out of the elements.
 		eventType = inclade[xpath"events/type/text()"]
@@ -99,6 +98,7 @@ function buildphyx(tree)
 		outEvents = CladeEvents(eventType, duplications, speciations, losses, outConfidence)
 		return outEvents
 	end
+	
 	function process_properties(instr)
 		properties = instr[xpath"property"]
 		propertiesOut = Array(Property, length(properties))
@@ -119,6 +119,7 @@ function buildphyx(tree)
 		end
 		return propertiesOut
 	end
+
 	function process_annotations(instr)
 		annotationsOut = Array(SeqAnnotation, length(instr))
 		for i in 1:length(annotationsOut)
@@ -133,7 +134,7 @@ function buildphyx(tree)
 			attrevidence = length(attrevidence) > 0 ? attrevidence[1] : ""
 			attrtype = length(attrtype) > 0 ? attrtype[1] : ""
 			desc = length(desc) > 0 ? desc[1] : ""
-			confidence = process_confidence(annotation)[1]
+			confidence = process_confidence(annotation)
 			uri = process_uri(annotation)
 			properties = process_properties(annotation)
 			annotationsOut[i] = SeqAnnotation(attrref, attrsource, attrevidence, attrtype, desc, confidence, uri, properties)
@@ -166,6 +167,7 @@ function buildphyx(tree)
 			uriOut = process_uri(seq)
 			outAccession = SeqAccession(seqAccessionSource, seqAccession)
 			molecularSequence = MolSeq(molSeqAligned, molSeq)
+			domainarch = process_domainArchitecture(seq)
 			outSequences[i] = CladeSequence(attrType, outAccession, seqName, symbol, molecularSequence, uriOut, annotations)
 		end
 		return outSequences
@@ -176,6 +178,29 @@ function buildphyx(tree)
 
 	end
 
+	function process_domainArchitecture(instr)
+		domains = instr[xpath"domain_architecture/domain"]
+		attrlength = domains[xpath"domain_architecture/@length"]
+		attrlength = length(attrlength) > 0 ? attrlength[1] : 0
+		outDomains = Array(Domain, length(domains))
+		for i in 1:length(domains)
+			dom = domains[i]
+			attrfrom = dom[xpath"@from"]
+			attrto = dom[xpath"@to"]
+			attrconfidence = dom[xpath"@confidence"]
+			attrid = dom[xpath"@id"]
+			token = dom[xpath"text()"]
+			attrfrom = length(attrfrom) > 0 ? attrfrom[1] : -1
+			attrto = length(attrto) > 0 ? attrto[1] : -1
+			attrconfidence = length(attrconfidence) > 0 ? attrconfidence[1] : -1
+			attrid = length(attrid) > 0 ? attrid[1] : -1
+			attrfrom = length(attrfrom) > 0 ? attrfrom[1] : -1
+			outDomains[i] = Domain(attrfrom, attrto, attrconfidence, attrid, token)
+		end
+
+
+	end
+
 	
 
 
@@ -187,7 +212,7 @@ function buildphyx(tree)
 
 
 
-
+# If no number is present in the xpath you've set it will return NaN or not a number.
 
 
 	rooted = get(tree.attr, "rooted", "") == "true" ? true : false
@@ -209,25 +234,33 @@ function buildphyx(tree)
 		end
 		name = currentClade[xpath"name/text()"]
 		name = length(name) > 0 ? name[1] : ""
-		branchLength = currentClade[xpath"@branch_length"]
-		if length(branchLength) == 0 && length(currentClade[xpath"branch_length"]) > 0
-			branchLength = currentClade[xpath"branch_length"]
+		branchLength = currentClade[xpath"number(@branch_length)"]
+		if isnan(branchLength) && !isnan(currentClade[xpath"number(branch_length)"])
+			branchLength = currentClade[xpath"number(branch_length)"]
 		end
-		branchLength = length(branchLength) > 0 ? float64(branchLength[1]) : 0.0
-		confidences = process_confidence(currentClade)
-		width = float64(currentClade[xpath"width/text()"])
-		width = length(width) > 0 ? width[1] : -1.0
-		colr = float64(currentClade[xpath"color/red/text()"])
-		colg = float64(currentClade[xpath"color/green/text()"])
-		colb = float64(currentClade[xpath"color/blue/text()"])
-		colr = length(colr) > 0 ? colr[1] : -1.0
-		colg = length(colg) > 0 ? colg[1] : -1.0
-		colb = length(colb) > 0 ? colb[1] : -1.0
+		confs = currentClade[xpath"confidence"]
+		confidences = Array(Confidence, length(confs))
+		for i in 1:length(confs)
+			confidences[i] = process_confidence(confs[i])
+		end
+
+		
+		# All these things appear to work.
+		width = currentClade[xpath"number(width)"]
+		colr = currentClade[xpath"number(color/red)"]
+		colg = currentClade[xpath"number(color/green)"]
+		colb = currentClade[xpath"number(color/blue)"]
 		branchcol = CladeColour(colr, colg, colb)
 		nodeid = currentClade[xpath"node_id/text()"]
 		nodeid = length(nodeid) > 0 ? nodeid[1] : ""
-		taxonomy = process_taxonomy(currentClade)
+		taxonomies = process_taxonomy(currentClade)
+
+
+
 		sequence = process_sequence(currentClade)
+		
+
+
 		events = process_events(currentClade)
 		binarychars = process_binary(currentClade)
 
