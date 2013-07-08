@@ -8,8 +8,7 @@ Version 0.0.1
 Phylogenetics.jl was started to mark the beginning of an explicit effort to bring means of working with phylogenetic data to Julia. 
 It is still - like most of Julia - in development, however features are increasingly becoming useable.
 
-# Installation
-This package has not yet been added to the Julia metadata and package system. I shall do this asap. 
+# Installation 
 ```
 Pkg.init() # Only the first time you install a Julia's Package
 

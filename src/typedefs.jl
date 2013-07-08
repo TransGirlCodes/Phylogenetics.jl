@@ -60,51 +60,125 @@ end
 # Definitions for the clade variables
 # Type containing the taxonomy information for a clade element.
 type CladeTaxonomy
-	provider::ASCIIString
-	taxonomyID::ASCIIString
-	taxonomyCode::ASCIIString
-	taxonomyAuthority::ASCIIString
+	attrIdSource::ASCIIString
+	id::TaxonomyID
+	code::ASCIIString
+	authority::ASCIIString
 	scientificName::ASCIIString
 	commonName::Array{String}
 	synonym::Array{String}
 	rank::ASCIIString
-	uriType::ASCIIString
-	uriDesc::ASCIIString
-	uri::ASCIIString
+	uri::Uri
+end
+type TaxonomyID
+	provider::ASCIIString
+	id::ASCIIString
 end
 
+# Type containing the uri information used in other types that clades contain.
+type Uri
+	attrDesc::ASCIIString
+	attrType::ASCIIString
+	string::ASCIIString
+end
 
+# Type containing the event information for any given clade.
+type CladeEvents
+	eventType::ASCIIString
+	duplications::Int32
+	speciations::Int32
+	losses::Int32
+	confidence::Confidence
+end
 
+# Type containing the confidence measure for a given clade feature.
+type Confidence
+	attrType::ASCIIString # The type of confidence value e.g. probability/bootstrap.
+	value::Float64 # The actual value as a floating point number.
+end
 
-
+# Type and subtypes containing the sequence information for clades.
 type CladeSequence
-	database::ASCIIString
-	accession::ASCIIString
+	attrType::ASCIIString
+	accession::SeqAccession
 	name::ASCIIString
 	symbol::ASCIIString
 	molSeq::MolSeq
-	binarySeq::ASCIIString
+	uri::Uri
+	annotations::Array{SeqAnnotation}
+	domainArchitecture::Array{}
 end
-
-type PhyXClade
-	cladeID::ASCIIString
-	taxonomy::PhyXTaxonomy
-	sequence::PhyXSequence
-	events::CladeEvents
-end
-
-type CladeEvents
-	speciations::Int
-end
-
-
-
-
-
-
 type MolSeq
 	aligned::Bool
 	sequence::ASCIIString
+end
+type SeqAccession
+	source::ASCIIString
+	accession::ASCIIString
+end
+type SeqAnnotation
+	attrRef::ASCIIString
+	attrSource::ASCIIString
+	attrEvidence::ASCIIString
+	attrType::ASCIIString
+	description::ASCIIString
+	confidence::Confidence
+	uri::Uri
+	properties::Array{Property}
+end
+
+# Type containing user defined properties.
+type Property
+	attrRef::ASCIIString
+	attrUnit::ASCIIString
+	attrDatatype::ASCIIString
+	attrAppliesto::ASCIIString
+	attrIdRef::ASCIIString
+	value
+end
+
+
+
+type BinaryCharacters
+	attrType::ASCIIString
+	attrGainedCount::Int64
+	attrLostCount::Int64
+	attrPresentCount::Int64
+	attrAbsentCount::Int64
+	gained::BinaryChar
+	lost::BinaryChar
+	present::BinaryChar
+	absent::BinaryChar
+end
+
+
+type CladeColour
+	red::Float64
+	green::Float64
+	blue::Float64
+end
+
+
+
+
+type PhyXClade
+	attrIdSource::ASCIIString
+	name::ASCIIString
+	branchLength::Float64
+	confidences::Array{Confidence}
+	width::Float64
+	branchColour::CladeColour
+	nodeID::ASCIIString
+	taxonomy::Array{CladeTaxonomy}
+	sequence::PhyXSequence
+	events::CladeEvents
+
+
+
+
+
+
+
 end
 
 	
