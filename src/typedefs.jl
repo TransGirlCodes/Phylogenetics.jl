@@ -23,12 +23,10 @@ type Clado <: Phylogeny
 	Clado(name::ASCIIString, edge::Array{Int}, tipLabel::Array{ASCIIString}, Nnode::Int, nodeLabel::Array{String}) = new(name, edge, tipLabel, Nnode, nodeLabel)
 end
 
-
 # Type definition for a small simple representation of a tree. 
 type ReducedTopology <: Phylogeny
 	name::ASCIIString
 	indiesArray::Array{Int}
-
 	function ReducedTopology(phy::Phylogeny)
 		children = phy.edge[1:size(phy.edge,1), 2]
 		parents = phy.edge[1:size(phy.edge,1), 1]
@@ -54,18 +52,27 @@ type PhyXTree
 	userData::Array{Array}
 end
 
-# Definition for the clade elements.
 
 
-# Definitions for the clade variables
-# Type containing user defined properties.
-type Property
+
+
+
+
+
+# Definitions for the clade variables.
+# Type containing user defined properties, and the outer constructors.
+type Property{T}
 	attrRef::ASCIIString
 	attrUnit::ASCIIString
-	attrDatatype::ASCIIString
+	attrDatatype::DataType
 	attrAppliesto::ASCIIString
 	attrIdRef::ASCIIString
-	value
+	value::T
+end
+# Properties outer constructor.
+function Property{T}(v::T; ref::ASCIIString="", unit::ASCIIString="", appliesto::ASCIIString="", idref::ASCIIString="")
+	typeval = typeof(v)
+	Property(ref,unit,typeval,appliesto,idref,v)
 end
 # Type containing the confidence measure for a given clade feature.
 type Confidence
@@ -102,11 +109,13 @@ end
 type SeqAccession
 	source::ASCIIString
 	accession::ASCIIString
+	SeqAccession(source::ASCIIString,acc::ASCIIString) = new(source,acc)
 end
 # Type containing the molecular sequence.
 type MolSeq
 	aligned::Bool
 	sequence::ASCIIString
+	MolSeq(align::Bool, seq::ASCIIString) = new(align, seq)
 end
 # Type containing the information for a given annotation.
 type SeqAnnotation
@@ -118,10 +127,29 @@ type SeqAnnotation
 	confidence::Confidence
 	uri::Uri
 	properties::Array{Property}
+	SeqAnnotation(aref::ASCIIString, asource::ASCIIString, aevidence::ASCIIString, atype::ASCIIString, desc::ASCIIString, con::Confidence, prop::Array{Property}) = new(aref, asource, aevidence, atype, desc, con, prop)
 end
-
-
-
+# Type containing info for a protein domain.
+type ProteinDomain
+	attrFrom::Int64
+	attrTo::Int64
+	attrConfidence::Float64
+	attrId::ASCIIString
+	token::ASCIIString
+	ProteinDomain(afrom::Int64, ato::Int64, aconf::Float64, aid::ASCIIString, token::ASCIIString) = new(afrom, ato, aconf, aid, token)
+end
+# Type and subtypes containing the sequence information for clades.
+type CladeSequence
+	attrType::ASCIIString
+	accession::SeqAccession
+	name::ASCIIString
+	symbol::ASCIIString
+	molSeq::MolSeq
+	uri::Uri
+	annotations::Array{SeqAnnotation}
+	proteinDomains::Array{ProteinDomain}
+	CladeSequence(atype::ASCIIString, acc::SeqAccession, name::ASCIIString, symb::ASCIIString, mol::MolSeq, uri::Uri, ann::Array{SeqAnnotation}, dom::Array{ProteinDomain}) = new(atype, acc, name, symb, mol, uri, ann, dom)
+end
 
 
 
@@ -153,20 +181,9 @@ end
 
 
 
-# Type and subtypes containing the sequence information for clades.
 
 
-type CladeSequence
-	attrType::ASCIIString
-	accession::SeqAccession
-	name::ASCIIString
-	symbol::ASCIIString
-	molSeq::MolSeq
-	uri::Uri
-	annotations::Array{SeqAnnotation}
-	domainArchitecture::DomainArchitecture
-	CladeSequence(atype::ASCIIString, acc::SeqAccession, name::ASCIIString, symb::ASCIIString, mol::MolSeq, uri::Uri, ann::Array{SeqAnnotation}, dom::DomainArchitecture) = new(atype, acc, name, symb, mol, uri, ann, dom)
-end
+
 
 
 
@@ -192,20 +209,12 @@ type CladeColour
 	red::Float64
 	green::Float64
 	blue::Float64
+	CladeColour(r::Float64, g::Float64, b::Float64) = new(r, g, b)
 end
 
-type DomainArchitecture
-	attrLength::Int64
-	domains::Array{Domain}
-end
 
-type Domain
-	attrFrom
-	attrTo
-	attrConfidence
-	attrId
 
-end
+
 
 
 type PhyXClade

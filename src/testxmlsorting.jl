@@ -40,6 +40,20 @@ function buildphyx(tree)
 		outUri = Uri(uridesc, uritype, uri)
 		return outUri
 	end
+	function process_confidence(instr)
+		if length(instr) > 0
+			confidence = instr[xpath"number()"]
+			confidenceType = instr[xpath"@type"]
+			confidenceType = length(confidenceType) > 0 ? confidenceType[1] : ""
+			outConfidence = Confidence(confidenceType, confidence)
+		else
+			outConfidence = Confidence("", NaN)
+		end
+		return outConfidence
+	end
+
+
+
 	function process_taxonomy(inclade)
 		# Extract the values out of the elements.
 		taxonomies = inclade[xpath"taxonomy"]
@@ -70,35 +84,6 @@ function buildphyx(tree)
 		end
 		return outTaxonomies
 	end
-
-
-
-
-	function process_confidence(instr)
-		confidence = instr[xpath"number()"]
-		confidenceType = instr[xpath"@type"]
-		confidenceType = length(confidenceType) > 0 ? confidenceType[1] : ""
-		outConfidence = Confidence(confidenceType, confidence)
-		return outConfidence
-	end
-	
-	function process_events(inclade)
-		# Get the values out of the elements.
-		eventType = inclade[xpath"events/type/text()"]
-		duplications = int32(inclade[xpath"events/duplications/text()"])
-		speciations = int32(inclade[xpath"events/speciations/text()"])
-		losses = int32(inclade[xpath"events/losses/text()"])
-		outConfidence = process_confidence(inclade[xpath"events"])[1]
-		# Sort out the values retrieved.
-		eventType = length(eventType) > 0 ? eventType[1] : ""
-		duplications = length(duplications) > 0 ? duplications[1] : int32(0)
-		speciations = length(speciations) > 0 ? speciations[1] : int32(0)
-		losses = length(losses) > 0 ? losses[1] : int32(0)
-		# Make the events type.
-		outEvents = CladeEvents(eventType, duplications, speciations, losses, outConfidence)
-		return outEvents
-	end
-	
 	function process_properties(instr)
 		properties = instr[xpath"property"]
 		propertiesOut = Array(Property, length(properties))
@@ -115,11 +100,10 @@ function buildphyx(tree)
 			attrdatatype = length(attrdatatype) > 0 ? attrdatatype[1] : ""
 			attrappliesto = length(attrappliesto) > 0 ? attrappliesto[1] : ""
 			attridref = length(attridref) > 0 ? attridref[1] : ""
-			propertiesOut[i] = Properties(attrref, attrunit, attrdatatype, attrappliesto, attridref, value)
+			propertiesOut[i] = Properties(value, ref=attrref, unit=attrunit, appliesto=attrappliesto, idref=attridref)
 		end
 		return propertiesOut
 	end
-
 	function process_annotations(instr)
 		annotationsOut = Array(SeqAnnotation, length(instr))
 		for i in 1:length(annotationsOut)
@@ -134,12 +118,33 @@ function buildphyx(tree)
 			attrevidence = length(attrevidence) > 0 ? attrevidence[1] : ""
 			attrtype = length(attrtype) > 0 ? attrtype[1] : ""
 			desc = length(desc) > 0 ? desc[1] : ""
-			confidence = process_confidence(annotation)
+			confidence = process_confidence(annotation[xpath"confidence"])
 			uri = process_uri(annotation)
 			properties = process_properties(annotation)
 			annotationsOut[i] = SeqAnnotation(attrref, attrsource, attrevidence, attrtype, desc, confidence, uri, properties)
 		end
 		return annotationsOut
+	end
+	function process_domainArchitecture(instr)
+		# Here is a case where some numbers() are fetched with xpath, but they are floats, we want Integers.
+		# If no value is returned from the xpath search a NaN is produced, meaning not a number. int64(NaN) does not work,
+		# so we check to see if it is a number, convert to integer, or if NaN, set the value to -1.
+		domains = instr[xpath"domain_architecture/domain"]
+		outDomains = Array(ProteinDomain, length(domains))
+		for i in 1:length(domains)
+			dom = domains[i]
+			attrfrom = dom[xpath"number(@from)"]
+			attrto = dom[xpath"number(@to)"]
+			attrconfidence = dom[xpath"number(@confidence)"]
+			attrid = dom[xpath"@id"]
+			token = dom[xpath"text()"]
+			attrfrom = !isnan(attrfrom) ? int64(attrfrom) : -1
+			attrto = length(attrto) > 0 ? int64(attrto) : -1
+			attrid = length(attrid) > 0 ? attrid[1] : ""
+			token = length(token) > 0 ? token[1] : "" 
+			outDomains[i] = ProteinDomain(attrfrom, attrto, attrconfidence, attrid, token)
+		end
+		return outDomains
 	end
 	function process_sequence(inclade)
 		sequences = inclade[xpath"sequence"]
@@ -168,38 +173,49 @@ function buildphyx(tree)
 			outAccession = SeqAccession(seqAccessionSource, seqAccession)
 			molecularSequence = MolSeq(molSeqAligned, molSeq)
 			domainarch = process_domainArchitecture(seq)
-			outSequences[i] = CladeSequence(attrType, outAccession, seqName, symbol, molecularSequence, uriOut, annotations)
+			outSequences[i] = CladeSequence(attrType, outAccession, seqName, symbol, molecularSequence, uriOut, annotations, domainarch)
 		end
 		return outSequences
 	end
+	function process_events(inclade)
+		# Get the values out of the elements.
+		eventType = inclade[xpath"events/type/text()"]
+		duplications = int32(inclade[xpath"events/duplications/text()"])
+		speciations = int32(inclade[xpath"events/speciations/text()"])
+		losses = int32(inclade[xpath"events/losses/text()"])
+		outConfidence = process_confidence(inclade[xpath"events/confidence"])
+		# Sort out the values retrieved.
+		eventType = length(eventType) > 0 ? eventType[1] : ""
+		duplications = length(duplications) > 0 ? duplications[1] : int32(0)
+		speciations = length(speciations) > 0 ? speciations[1] : int32(0)
+		losses = length(losses) > 0 ? losses[1] : int32(0)
+		# Make the events type.
+		outEvents = CladeEvents(eventType, duplications, speciations, losses, outConfidence)
+		return outEvents
+	end
+
 	
+
+
+
+
+	
+	
+
+
+
+
+
+
+
+
+
 	function process_binary(inclade)
 		binary = inclade[xpath"binary_characters"]
 
 	end
 
-	function process_domainArchitecture(instr)
-		domains = instr[xpath"domain_architecture/domain"]
-		attrlength = domains[xpath"domain_architecture/@length"]
-		attrlength = length(attrlength) > 0 ? attrlength[1] : 0
-		outDomains = Array(Domain, length(domains))
-		for i in 1:length(domains)
-			dom = domains[i]
-			attrfrom = dom[xpath"@from"]
-			attrto = dom[xpath"@to"]
-			attrconfidence = dom[xpath"@confidence"]
-			attrid = dom[xpath"@id"]
-			token = dom[xpath"text()"]
-			attrfrom = length(attrfrom) > 0 ? attrfrom[1] : -1
-			attrto = length(attrto) > 0 ? attrto[1] : -1
-			attrconfidence = length(attrconfidence) > 0 ? attrconfidence[1] : -1
-			attrid = length(attrid) > 0 ? attrid[1] : -1
-			attrfrom = length(attrfrom) > 0 ? attrfrom[1] : -1
-			outDomains[i] = Domain(attrfrom, attrto, attrconfidence, attrid, token)
-		end
-
-
-	end
+	
 
 	
 
@@ -243,8 +259,6 @@ function buildphyx(tree)
 		for i in 1:length(confs)
 			confidences[i] = process_confidence(confs[i])
 		end
-
-		
 		# All these things appear to work.
 		width = currentClade[xpath"number(width)"]
 		colr = currentClade[xpath"number(color/red)"]
@@ -254,9 +268,6 @@ function buildphyx(tree)
 		nodeid = currentClade[xpath"node_id/text()"]
 		nodeid = length(nodeid) > 0 ? nodeid[1] : ""
 		taxonomies = process_taxonomy(currentClade)
-
-
-
 		sequence = process_sequence(currentClade)
 		
 
