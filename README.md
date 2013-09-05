@@ -5,7 +5,6 @@ Version 0.0.0
 **The Julia package for Analysis of Phylogeny and Evolution**
 
 # Installation
-This package has not yet been added to the Julia metadata and package system. I shall do this asap. 
 ```
 Pkg.init() # Only the first time you install a Julia's Package
 
