@@ -10,20 +10,20 @@ type Phylo <: Phylogeny
 	edgeLength::Array{Float64}
 	nodeLabel::Array{String}
 	rootEdge::Float64
-	Phylo(name::ASCIIString, edge::Array{Int}, Nnode::Int, tipLabel::Array{ASCIIString}, edgeLength::Array{Float64}, nodeLabel::Array{String}, rootEdge::Float64) = new(name, edge, Nnode, tipLabel, edgeLength, nodeLabel, rootEdge)
+	Phylo(name::ASCIIString, edge::Array{Int}, Nnode::Int, tipLabel::Array{ASCIIString}, edgeLength::Array{Float64}, nodeLabel::Array{ASCIIString}, rootEdge::Float64) = new(name, edge, Nnode, tipLabel, edgeLength, nodeLabel, rootEdge)
 end
 
-# The type definition for a Phylogenetic Tree without branch lengths. 
+# The type definition for a Phylogenetic Tree without branch lengths.
 type Clado <: Phylogeny
 	name::ASCIIString
 	edge::Array{Int}
 	tipLabel::Array{ASCIIString}
 	Nnode::Int
 	nodeLabel::Array{String}
-	Clado(name::ASCIIString, edge::Array{Int}, tipLabel::Array{ASCIIString}, Nnode::Int, nodeLabel::Array{String}) = new(name, edge, tipLabel, Nnode, nodeLabel)
+	Clado(name::ASCIIString, edge::Array{Int}, tipLabel::Array{ASCIIString}, Nnode::Int, nodeLabel::Array{ASCIIString}) = new(name, edge, tipLabel, Nnode, nodeLabel)
 end
 
-# Type definition for a small simple representation of a tree. 
+# Type definition for a small simple representation of a tree.
 type ReducedTopology <: Phylogeny
 	name::ASCIIString
 	indiesArray::Array{Int}
