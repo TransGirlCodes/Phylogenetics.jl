@@ -4,7 +4,7 @@ function TreeRead(filepath::ASCIIString, format="nwk")
 	instring = readall(instream)
 	close(instream)
 	trees = split(instring, ';')
-	trees = [replace(i, r"(\r|\n|\s)", "") for i in trees] 
+	trees = [replace(i, r"(\r|\n|\s)", "") for i in trees]
 	trees = trees[bool([length(t) > 0 for t in trees])]
 	if length(trees) == 1
 		if search(trees[1], ":") == 0:-1
@@ -29,7 +29,7 @@ end
 
 
 # Sub function for creation of a Clado structs from newick format strings.
-# Used to build Clado structs from newick strings during operation of the 
+# Used to build Clado structs from newick strings during operation of the
 # TreeRead function.
 function CladoBuild(tp::ASCIIString)
 	function AddInternal(edge, currentNode, node, index, j)
@@ -82,7 +82,7 @@ function CladoBuild(tp::ASCIIString)
 	tsp = split(tp, "")
 	tp = replace(tp, "\s", "")
 	tp = replace(tp, ")", ")NA")
-	tp = replace(tp, "(", "rem(")		
+	tp = replace(tp, "(", "rem(")
 	tpc = split(tp, r"[\\(\\),;]")
 	tpc = tpc[1:length(tpc)-1]
 	tpc = tpc[tpc .!= "rem"]
@@ -118,7 +118,9 @@ function CladoBuild(tp::ASCIIString)
 		end
 	end
 	edge = edge[1:nbEdge-1, 1:2]
-	nodeLabel = [replace(i, r"^NA", "") for i in nodeLabel]
+        for i in 1:length(nodeLabel)
+            nodeLabel[i] = replace(nodeLabel[i],r"^NA","")
+        end
 	phyloobject = Clado(treeName, edge, tipLabel, nbNode, nodeLabel)
 	return phyloobject
 end
@@ -126,7 +128,7 @@ end
 
 
 # Sub function for creation of a Phylo structs from newick format strings.
-# Used to build Phylo structs from newick strings during operation of the 
+# Used to build Phylo structs from newick strings during operation of the
 # TreeRead function.
 function TreeBuild(tp::ASCIIString)
 	function AddInternal(edge, j, currentNode, node, index)
@@ -209,12 +211,12 @@ function TreeBuild(tp::ASCIIString)
     index = [0 for i in 1:(nbEdge + 1)]
     index[node] = nbEdge
     j = k = tip = 1
-	for i in 2:nsk
-        if skeleton[i] == "(" 
+    for i in 2:nsk
+        if skeleton[i] == "("
             node, currentNode, j = AddInternal(edge, j, currentNode, node, index)
         end
         if skeleton[i] == ","
-            if skeleton[i - 1] != ")" 
+            if skeleton[i - 1] != ")"
                 k, tip, j = AddTerminal(edge, j, currentNode, tip, index, tpc, k, tipLabel, edgeLength)
             end
         end
@@ -228,17 +230,20 @@ function TreeBuild(tp::ASCIIString)
             end
         end
     end
-	edge = edge[1:nbEdge-1, 1:2]
-	rootEdge = edgeLength[nbEdge]
-	if rootEdge != "NA"	# Resolve whether there is a rootedge for the tree.
-		rootEdge = float64(rootEdge)
-	else
-		rootEdge = -1.0
-	end
-	edgeLength = float64([i == "" ? -1.0 : float64(i) for i in edgeLength[1:nbEdge-1]])
-	nodeLabel = [replace(i, r"^NA", "") for i in nodeLabel]
-	phyloobject = Phylo(treeName, edge, nbNode, tipLabel, edgeLength, nodeLabel, rootEdge)
-	return phyloobject
+    edge = edge[1:nbEdge-1, 1:2]
+    rootEdge = edgeLength[nbEdge]
+    if rootEdge != "NA" # Resolve whether there is a rootedge for the tree.
+        rootEdge = float64(rootEdge)
+    else
+        rootEdge = -1.0
+    end
+    edgeLength = float64([i == "" ? -1.0 : float64(i) for i in edgeLength[1:nbEdge-1]])
+    for i in 1:length(nodeLabel)
+        nodeLabel[i] = replace(nodeLabel[i],r"^NA","")
+    end
+    # nodeLabel = [replace(i, r"^NA", "") for i in nodeLabel]
+    phyloobject = Phylo(treeName, edge, nbNode, tipLabel, edgeLength, nodeLabel, rootEdge)
+    return phyloobject
 end
 
 
@@ -384,13 +389,13 @@ function writenewick(phy::Clado, name)
 	end
 	if name == true && prefix != ""
 		namebit = chop(match(r"^[^\(]+\(", outstring).match)
-		replace(outstring, namebit, "$namebit ")  
+		replace(outstring, namebit, "$namebit ")
 	end
 	return outstring
 end
 
 
-# Function that creates 
+# Function that creates
 function writenewick(phy::Phylo, name)
 	function addInternal(i, k, STRING, N, nodelab, tiplab, ind)
 		k, STRING = cp("(", k, STRING)
@@ -463,7 +468,7 @@ function writenewick(phy::Phylo, name)
 	end
 	if name == true && prefix != ""
 		namebit = chop(match(r"^[^\(]+\(", outstring).match)
-		replace(outstring, namebit, "$namebit ")  
+		replace(outstring, namebit, "$namebit ")
 	end
 	return outstring
 end
