@@ -215,6 +215,25 @@ function buildphyx(tree)
 
 	end
 
+	function process_point(instr)
+		attrgeo = instr[xpath"@geodetic_datum"]
+		attraltunit = instr[xpath"@alt_unit"]
+		longlatalt = instr[xpath"*"]
+		long = instr[xpath"number(long)"]
+		lat = instr[xpath"number(lat)"]
+		alt = instr[xpath"number(alt)"]
+	end
+
+	function process_distribution(inclade)
+		distrib = inclade[xpath"distribution"]
+		description = distrib[xpath"description/text()"]
+		description = length(description) > 0 ? description[1] : ""
+		outPoints = Array(Point, length(distrib))
+		points = distrib[xpath"point"]
+		for i in 1:length(point)
+			outPoint = process_point(points[i])
+	end
+
 	
 
 	
@@ -273,6 +292,7 @@ function buildphyx(tree)
 
 
 		events = process_events(currentClade)
+
 		binarychars = process_binary(currentClade)
 
 

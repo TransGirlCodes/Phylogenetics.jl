@@ -150,34 +150,50 @@ type CladeSequence
 	proteinDomains::Array{ProteinDomain}
 	CladeSequence(atype::ASCIIString, acc::SeqAccession, name::ASCIIString, symb::ASCIIString, mol::MolSeq, uri::Uri, ann::Array{SeqAnnotation}, dom::Array{ProteinDomain}) = new(atype, acc, name, symb, mol, uri, ann, dom)
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Type containing the event information for any given clade.
 type CladeEvents
 	eventType::ASCIIString
-	duplications::Int32
-	speciations::Int32
-	losses::Int32
-	confidence::Array{Confidence}
+	duplications::Int64
+	speciations::Int64
+	losses::Int64
+	confidence::Confidence
 end
+# Type to contain colours for plotting a clade.
+type CladeColour
+	red::Float64
+	green::Float64
+	blue::Float64
+	CladeColour(r::Float64, g::Float64, b::Float64) = new(r, g, b)
+end
+
+
+
+
+# Type for point data for use in Type Distribution.
+type Point
+	attrGeodietic::ASCIIString 	# 1 Required
+	attrAltUnit::ASCIIString 	# Optional
+	lattitude::Float64 			# 1 Required
+	longitude::Float64 			# 1 Required
+	altitude::Float64 			# Optional
+end
+
+
+
+type Distribution
+	description::ASCIIString
+	points::Array{Point}
+	polygon::Array{Polygon}
+end
+
+
+
+
+
+
+
+
+
 
 
 
@@ -205,12 +221,7 @@ type BinaryCharacters
 end
 
 
-type CladeColour
-	red::Float64
-	green::Float64
-	blue::Float64
-	CladeColour(r::Float64, g::Float64, b::Float64) = new(r, g, b)
-end
+
 
 
 
