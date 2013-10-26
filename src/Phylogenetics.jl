@@ -8,10 +8,10 @@ module Phylogenetics
 		Phylo,
 		Clado,
 		ReducedTopology,
-		TreeRead,
-		treeWrite,
-		getRoot,
-		getKids,
+		readtree,
+		writetree,
+		getroot,
+		getkids,
 		@tr_str
 
 	## Load Package Files
@@ -19,4 +19,3 @@ module Phylogenetics
 	include(Pkg.dir("Phylogenetics", "src", "treeio.jl"))
 
 end
-
