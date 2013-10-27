@@ -1,37 +1,29 @@
-# Function for reading in a tree from file.
-function TreeRead(filepath::ASCIIString, format="nwk")
+# Read in a set of trees from a file
+# Returns an array of trees
+function readtree(filepath::ASCIIString, format="nwk")
 	instream = open(expanduser(filepath))
 	instring = readall(instream)
 	close(instream)
-	trees = split(instring, ';')
+	trees = split(instring, ';'a)
 	trees = [replace(i, r"(\r|\n|\s)", "") for i in trees]
 	trees = trees[bool([length(t) > 0 for t in trees])]
-	if length(trees) == 1
-		if search(trees[1], ":") == 0:-1
-			tree = CladoBuild(trees[1])
-			return tree
-		elseif search(trees[1], ":") != 0:-1
-			tree = TreeBuild(trees[1])
-			return tree
-		end
-	end
-	outputTrees = Array(Phylogeny, length(trees))
+	output_trees = Array(Phylogeny, length(trees))
 	for i in 1:length(trees)
 		if search(trees[i], ":") == 0:-1
-			outputTrees[i] = CladoBuild(trees[i])
+			output_trees[i] = cladobuild(trees[i])
 		elseif search(trees[i], ":") != 0:-1
-			outputTrees[i] = TreeBuild(trees[i])
+			output_trees[i] = treebuild(trees[i])
 		end
 	end
-	return outputTrees
+	return output_trees
 end
 
 
 
 # Sub function for creation of a Clado structs from newick format strings.
 # Used to build Clado structs from newick strings during operation of the
-# TreeRead function.
-function CladoBuild(tp::ASCIIString)
+# readtree function.
+function cladobuild(tp::ASCIIString)
 	function AddInternal(edge, currentNode, node, index, j)
 		edge[j, 1] = currentNode
 		node += 1
@@ -121,7 +113,7 @@ function CladoBuild(tp::ASCIIString)
         for i in 1:length(nodeLabel)
             nodeLabel[i] = replace(nodeLabel[i],r"^NA","")
         end
-	phyloobject = Clado(treeName, edge, tipLabel, nbNode, nodeLabel)
+	phyloobject = Clado(treeName, edge, nbNode, tipLabel, nodeLabel)
 	return phyloobject
 end
 
@@ -129,8 +121,8 @@ end
 
 # Sub function for creation of a Phylo structs from newick format strings.
 # Used to build Phylo structs from newick strings during operation of the
-# TreeRead function.
-function TreeBuild(tp::ASCIIString)
+# readtree function.
+function treebuild(tp::ASCIIString)
 	function AddInternal(edge, j, currentNode, node, index)
 		edge[j, 1] = currentNode
 		node += 1
@@ -249,8 +241,11 @@ end
 
 
 # Function method for writing a single Phylogeny type to file.
-function TreeWrite(tree::Phylogeny, file::ASCIIString = "output.nwk", append::Bool = false, treeNames::Bool = true)
-	output = writenewick(tree, treeNames)
+function treewrite(tree::Phylogeny,
+                   file::ASCIIString = "output.nwk",
+                   append::Bool = false,
+                   treeNames::Bool = true)
+	output = newick(tree, treeNames)
 	if append == true
 		outstream = open(file, "a")
 	else
@@ -262,10 +257,13 @@ end
 
 
 # Function method for writing multiple trees to file. In order to do this they must be as an array.
-function TreeWrite(tree::Array{Phylogeny}, file::ASCIIString = "output.nwk", append::Bool = false, treeNames::Bool = false)
+function treewrite(tree::Array{Phylogeny},
+                   file::ASCIIString = "output.nwk",
+                   append::Bool = false,
+                   treeNames::Bool = false)
 	outputarray = Array(ASCIIString, length(tree))
 	for i in 1:length(tree)
-		outputarray[i] = writenewick(tree[i], treeNames)
+		outputarray[i] = newick(tree[i], treeNames)
 	end
 	if apppend == true
 		outstream = open(file, "a")
@@ -304,8 +302,8 @@ end
 
 
 # Returns the internal node which is the root of the tree.
-function getRoot(children, parents)
-	r = parents[[find(contains(children, i)) == [1] ? false : true for i in parents]][1]
+function getroot(children, parents)
+	r = parents[[find(in(children, i)) == [1] ? false : true for i in parents]][1]
 	return r
 end
 
@@ -313,7 +311,7 @@ end
 
 # This function returns an array of arrays, showing which children
 # nodes have.
-function getKids(phy::Phylogeny)
+function getkids(phy::Phylogeny)
 	N = length(phy.tipLabel)
 	kids = Array(Array{Int64}, N + phy.Nnode)
 	for i in 1:N + phy.Nnode
@@ -324,8 +322,8 @@ function getKids(phy::Phylogeny)
 end
 
 
-
-function writenewick(phy::Clado, name)
+# Construct a newick string from a Cladogram
+function newick(phy::Clado, name::Bool)
 	function addInternal(i, k, STRING, N, nodelab, tiplab, ind)
 		k, STRING = cp("(", k, STRING)
 		desc = kids[i]
@@ -360,16 +358,15 @@ function writenewick(phy::Clado, name)
 	children = phy.edge[1:size(phy.edge,1), 2]
 	parents = phy.edge[1:size(phy.edge,1), 1]
 	N = length(phy.tipLabel)
-	kids = getKids(phy)
+	kids = getkids(phy)
 	LS = (4 * N) + 5
 	LS = LS + N # if there are nodelabels.
-	ind = [findin(children, i) for i in 1:max(phy.edge)]
+	ind = [findin(children, i) for i in 1:maximum(phy.edge)]
 	STRING = ["" for i in 1:LS]
 	k = 1
 	k, STRING = cp(prefix, k, STRING)
 	k, STRING = cp("(", k, STRING)
-	root = getRoot(children, parents)
-	desc = kids[root]
+	desc = kids[getroot(children, parents)]
 	for j in desc
 		if j > N
 			STRING, k = addInternal(j, k, STRING, N, nodelab, tiplab, ind)
@@ -396,7 +393,7 @@ end
 
 
 # Function that creates
-function writenewick(phy::Phylo, name)
+function newick(phy::Phylo, name::Bool)
 	function addInternal(i, k, STRING, N, nodelab, tiplab, ind)
 		k, STRING = cp("(", k, STRING)
 		desc = kids[i]
@@ -438,17 +435,16 @@ function writenewick(phy::Phylo, name)
 	children = phy.edge[1:size(phy.edge,1), 2]
 	parents = phy.edge[1:size(phy.edge,1), 1]
 	N = length(phy.tipLabel)
-	kids = getKids(phy)
+	kids = getkids(phy)
 	LS = (4 * N) + 5
 	LS = LS + N
 	LS = LS +(4 * N)
-	ind = [findin(children, i) for i in 1:max(phy.edge)]
+	ind = [findin(children, i) for i in 1:maximum(phy.edge)]
 	STRING = ["" for i in 1:LS]
 	k = 1
 	k, STRING = cp(prefix, k, STRING)
 	k, STRING = cp("(", k, STRING)
-	root = getRoot(children, parents)
-	desc = kids[root]
+	desc = kids[getroot(children, parents)]
 	for j in desc
 		if j > N
 			STRING, k = addInternal(j, k, STRING, N, nodelab, tiplab, ind)
@@ -481,10 +477,10 @@ macro tr_str(s)
 		s = s[1:length(s)-1]
 	end
 	if search(s, ":") == 0:-1
-		tree = CladoBuild(s)
+		tree = cladobuild(s)
 		return tree
 	elseif search(s, ":") != 0:-1
-		tree = TreeBuild(s)
+		tree = treebuild(s)
 		return tree
 	end
 end
