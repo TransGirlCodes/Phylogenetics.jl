@@ -4,7 +4,7 @@ function readtree(filepath::ASCIIString, format="nwk")
 	instream = open(expanduser(filepath))
 	instring = readall(instream)
 	close(instream)
-	trees = split(instring, ';'a)
+	trees = split(instring, ';')
 	trees = [replace(i, r"(\r|\n|\s)", "") for i in trees]
 	trees = trees[bool([length(t) > 0 for t in trees])]
 	output_trees = Array(Phylogeny, length(trees))
@@ -72,7 +72,7 @@ function cladobuild(tp::ASCIIString)
 		return phyloobject
 	end
 	tsp = split(tp, "")
-	tp = replace(tp, "\s", "")
+	tp = replace(tp, r"\s", "")
 	tp = replace(tp, ")", ")NA")
 	tp = replace(tp, "(", "rem(")
 	tpc = split(tp, r"[\\(\\),;]")
@@ -183,7 +183,7 @@ function treebuild(tp::ASCIIString)
 		tp = "$st1$newString"
 	end
 	tp = replace(tp, ")", ")NA")
-	tp = replace(tp, "\s", "")
+	tp = replace(tp, r"\s", "")
 	tp = replace(tp, "(", "rem(")
 	tpc = split(tp, r"[\\(\\),;]")
 	tpc = tpc[1:length(tpc)-1]
