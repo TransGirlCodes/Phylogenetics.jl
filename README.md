@@ -1,6 +1,6 @@
 Phylogenetics
 =====
-Version 0.0.0
+Version 0.0.1
 
 **The Julia package for Analysis of Phylogeny and Evolution**
 
