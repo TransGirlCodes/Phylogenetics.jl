@@ -4,15 +4,7 @@ Version 0.0.1
 
 **The Julia package for Analysis of Phylogeny and Evolution**
 
-<<<<<<< HEAD
-# Phylogenetics.jl
-Phylogenetics.jl was started to mark the beginning of an explicit effort to bring means of working with phylogenetic data to Julia. 
-It is still - like most of Julia - in development, however features are increasingly becoming useable.
-
-# Installation 
-=======
 # Installation
->>>>>>> master
 ```
 Pkg.init() # Only the first time you install a Julia's Package
 
@@ -21,11 +13,7 @@ Pkg.add("Phylogenetics") # Install Phylogenetics.jl
 using Phylogenetics # to use Phylogenetics
 ```
 
-<<<<<<< HEAD
-# Current Useable Features
-=======
 # Features
->>>>>>> master
 
 * Types for Phylogenies
   * Abstract type "Phylogeny".

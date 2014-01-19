@@ -1,30 +1,3 @@
-<<<<<<< HEAD
-# Function for reading in a tree from file.
-function TreeRead(filepath::ASCIIString)
-	instream = open(expanduser(filepath))
-	instring = readall(instream)
-	close(instream)
-	if search(instring, ";") != 0:-1 && search(instring, "(") != 0:-1 && search(instring, "(")
-		trees = split(instring, ';')
-		trees = [replace(i, r"(\r|\n|\s)", "") for i in trees]
-		trees = trees[bool([t != "" for t in trees])]
-		if length(trees) == 1
-			if search(trees[1], ":") == 0:-1
-				tree = CladoBuild(trees[1])
-				return tree
-			elseif search(trees[1], ":") != 0:-1
-				tree = TreeBuild(trees[1])
-				return tree
-			end
-		end
-		outputTrees = Array(Phylogeny, length(trees))
-		for i in 1:length(trees)
-			if search(trees[i], ":") == 0:-1
-				outputTrees[i] = CladoBuild(trees[i])
-			elseif search(trees[i], ":") != 0:-1
-				outputTrees[i] = TreeBuild(trees[i])
-			end
-=======
 # Read in a set of trees from a file
 # Returns an array of trees
 function readtree(filepath::ASCIIString, format="nwk")
@@ -40,79 +13,10 @@ function readtree(filepath::ASCIIString, format="nwk")
 			output_trees[i] = cladobuild(trees[i])
 		elseif search(trees[i], ":") != 0:-1
 			output_trees[i] = treebuild(trees[i])
->>>>>>> master
 		end
-		return outputTrees
-	elseif search(instring, "phyloxml") != 0:-1 && search(instring,"<") != 0:-1 && search(instring, ">")
-		# # Lets first sort out all the trees present in the file.
-		# instring = replace(instring, r"<phyloxml.*>", "")
-		# instring = replace(instring, r"</phyloxml>", "")
-		# trees = split(instring, "</phylogeny>")
-		# trees = [replace(i, r"(\r|\n)", "") for i in trees]
-		# trees = trees[bool([t != "" for t in trees])]
-		# if length(trees) == 1
-		# 	tree = phyxbuild(trees[1])
-		# 	return tree
-		# end
-		# outputTrees = Array(PhyloX, length(trees))
-		# for i in 1:length(trees)
-		# 	outputTrees[i] = phyxbuild(trees[i])
-		# end
-		# return outputTrees
 	end
-<<<<<<< HEAD
-=======
 	return output_trees
->>>>>>> master
 end
-
-
-
-
-# # Redundant and destined for deletion, once new code is finished.
-# function xmlread(args)
-# 	# First let's sort the input. Let's split each segment into it's own array element.
-# 	inputArray = split(input, r">\s*<")
-# 	inputArray = ["<$i>" for i in inputArray]
-# 	inputArray = [replace(i, r"\s{4}", "") for i in inputArray]
-# 	inputArray = [replace(i, "<<", "<") for i in inputArray]
-# 	inputArray = [replace(i, ">>", ">") for i in inputArray]
-# 	nClades = sum(inputArray .== "<clade>")
-# 	nClades == sum(inputArray .== "</clade>")
-# 	structure = zeros(Int, nClades)
-# 	rooted = false
-# 	rerootable = false
-# 	features = Array(Array{ASCIIString}, nClades)
-# 	features = fill!(features, [""])
-# 	# Fathom the struture of the tree and get features from it...
-# 	node = 0
-# 	clademax = 0
-# 	# First bash at a prototype phyxml parsing loop.
-# 	for n in 1:length(inputArray)
-# 		x = inputArray[n]
-# 		if ismatch(r"<clade[^<>]*>", x) 
-# 			clademax += 1
-# 			structure[clademax] = node
-# 			node = clademax
-# 			features[node] = [features[node], x]
-# 		elseif ismatch(r"</clade>", x)
-# 			node = structure[clademax]
-# 		elseif node > 0
-# 			features[node] = [features[node], x]
-# 		end
-# 	end
-# 	features = [n[bool([i != "" for i in n])] for n in features]
-# 	# Got the structure and features divvied out to appropriate nodes. Now we need to deal with these features.
-# 	edge = hcat(structure, [1:nClades])
-# 	ind = [findin(structure, i) for i in [1,2,3,4,5]] # Figure which nodes have kids.
-# 	tips = [1:nClades][[i == [] for i in ind]] # Tip nodes should have no kids.
-# 	nodes = [1:nClades][[i != [] for i in ind]] # Internal nodes should have kids.
-# 	newNodes = [length(tips) + i for i in 1:length(nodes)]
-# 	tipNodes = [processtips(tips[i], features[tips[i]], nodes, structure) for i in 1:length(tips)]
-# end
-
-
-
 
 
 
