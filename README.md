@@ -37,4 +37,4 @@ using Phylogenetics # to use Phylogenetics
 Contributing
 ------------
 
-**Fork and send a pull request or create a [GitHub issue](https://github.com/Ward9250/Phylo.jl/issues) for bug reports or feature requests.  Or if you created the feature you wanted put in a pull request! Request pulls to devel branch to keep master more stable and give time to find bugs before merge with master branch.**
+**Fork and send a pull request or create a [GitHub issue](https://github.com/Ward9250/Phylogenetics.jl/issues) for bug reports or feature requests.  Or if you created the feature you wanted put in a pull request! Request pulls to devel branch to keep master more stable and give time to find bugs before merge with master branch.**
