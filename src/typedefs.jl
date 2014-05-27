@@ -56,6 +56,16 @@ end
 
 # equality, etc.
 
+function =={T<:Phylogeny}(p1::T,p2::T)
+    for field in names(T)
+        if getfield(p1,field) != getfield(p2,field)
+            return false
+        end
+    end
+    return true
+end
+
+# Julia 0.2 compatibility
 function isequal{T<:Phylogeny}(p1::T,p2::T)
     for field in names(T)
         if !isequal(getfield(p1,field),getfield(p2,field))
