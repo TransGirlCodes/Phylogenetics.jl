@@ -4,6 +4,9 @@ Version 0.0.1
 
 **The Julia package for Analysis of Phylogeny and Evolution**
 
+**Note: Myself, and so Phylogenetics.jl are now contributing to the Bio.jl project, which aims to bring a bioinformatics suite to Julia.**
+**Phylogenetics.jl is becomming the Bio.jl 'phylo' module, and almost all working Phylogenetics.jl code has been incorporated. Whilst any contributions to this repository are welcome and I shall move changes to the phylo module of Bio.jl in due time, consider instead getting involved in the Bio.jl project and forking one of the Bio.jl repos =]** 
+
 # Installation
 ```
 Pkg.init() # Only the first time you install a Julia's Package
