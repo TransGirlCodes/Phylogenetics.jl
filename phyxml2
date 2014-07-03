@@ -1,0 +1,54 @@
+<phyloxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phyloxml.org" xsi:schemaLocation="http://www.phyloxml.org http://www.phyloxml.org/1.10/phyloxml.xsd">
+ <phylogeny rooted="true">
+      <name>similar example, with more detailed sequence data</name>
+      <clade>
+         <clade>
+            <clade>
+               <taxonomy>
+                  <id provider="NCBI">6645</id>
+                  <code>OCTVU</code>
+                  <scientific_name>Octopus vulgaris</scientific_name>
+               </taxonomy>
+               <sequence>
+                  <symbol>ADHX</symbol>
+                  <accession source="UniProtKB">P81431</accession>
+                  <name>Alcohol dehydrogenase class-3</name>
+                  <mol_seq>TDATGKPIKCMAAIAWEAKKPLSIEEVEVAPPKSGEVRIKILHSGVCHTD</mol_seq>
+                  <annotation ref="EC:1.1.1.1" />
+                  <annotation ref="GO:0004022" />
+               </sequence>
+            </clade>
+            <clade>
+               <taxonomy>
+                  <id provider="NCBI">44689</id>
+                  <code>DICDI</code>
+                  <scientific_name>Dictyostelium discoideum</scientific_name>
+               </taxonomy>
+               <sequence>
+                  <symbol>RT4I1</symbol>
+                  <accession source="UniProtKB">Q54II4</accession>
+                  <name>Reticulon-4-interacting protein 1 homolog, mitochondrial precursor</name>
+                  <mol_seq>MKGILLNGYGESLDLLEYKTDLPVPKPIKSQVLIKIHSTSINPLDNVMRK</mol_seq>
+                  <annotation ref="GO:0008270" />
+                  <annotation ref="GO:0016491" />
+               </sequence>
+            </clade>
+         </clade>
+         <clade>
+            <taxonomy>
+               <id provider="NCBI">1488</id>
+               <code>CLOAB</code>
+               <scientific_name>Clostridium acetobutylicum</scientific_name>
+            </taxonomy>
+            <sequence>
+               <symbol>ADHB</symbol>
+               <accession source="UniProtKB">Q04945</accession>
+               <name>NADH-dependent butanol dehydrogenase B</name>
+               <mol_seq>MVDFEYSIPTRIFFGKDKINVLGRELKKYGSKVLIVYGGGSIKRNGIYDK</mol_seq>
+               <annotation ref="GO:0046872" />
+               <annotation ref="KEGG:Tetrachloroethene degradation" />
+            </sequence>
+         </clade>
+      </clade>
+   </phylogeny>
+</phyloxml>

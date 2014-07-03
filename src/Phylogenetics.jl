@@ -1,4 +1,4 @@
-module Phylogenetics
+module Phylo
 	## Dependencies
 	using Base.Intrinsics
 	importall Base
