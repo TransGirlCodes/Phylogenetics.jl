@@ -53,6 +53,36 @@ function ReducedTopology(phy::Array{Phylogeny})
 	return outarray
 end
 
+type PhyXElementBase
+  Label::String
+  Root::Bool
+  Tip::Bool
+  Parent::Int
+
+  PhyXElementBase(lab::String, isroot::Bool, istip::Bool, parent::Int64) = new(lab, isroot, istip, parent)
+end
+
+type PhyXExtension{T}
+  value::T
+end
+
+type PhyXElement
+  Base::PhyXElementBase
+  Extensions::Array{PhyXExtension}
+
+  PhyXElement(base::PhyXElementBase, ext::Array{PhyXExtension, 1}) = new(base, ext)
+end
+
+type PhyXTree
+  Name::String
+  Clades::Array{PhyXElement}
+  Rooted::Bool
+end
+
+type nodeTracker
+  nodeIndex::Int
+end
+
 
 # equality, etc.
 
