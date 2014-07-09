@@ -53,6 +53,7 @@ function ReducedTopology(phy::Array{Phylogeny})
 	return outarray
 end
 
+
 type PhyXElementBase
   Label::String
   Root::Bool

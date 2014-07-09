@@ -8,6 +8,9 @@ module Phylo
 		Phylo,
 		Clado,
 		ReducedTopology,
+		PhyXElementBase,
+		PhyXExtension,
+		PhyXTree,
 		readtree,
 		writetree,
 		getroot,
@@ -17,5 +20,4 @@ module Phylo
 	## Load Package Files
 	include(Pkg.dir("Phylogenetics", "src", "typedefs.jl"))
 	include(Pkg.dir("Phylogenetics", "src", "treeio.jl"))
-
 end
