@@ -1,3 +1,53 @@
+# Recursive Build Functions...
+
+# Recusrsiveley builds tree structure from PhyloXML format. 
+function buildRecursively(xmlclade::XMLElement, extensionsArray, parent::PhyXElement)
+  label::String = ""
+  children::Array{XMLElement, 1} = get_elements_by_tagname(xmlclade, "clade")
+  istip::Bool = length(children) == 0 ? true : false 
+  element::PhyXElement = PhyXElement(label, false, istip, PhyXExtension[parsePhyloXML(xmlclade, i) for i in extensionsArray], parent)
+  element.Children = PhyXElement[buildRecursively(n, extensionsArray, element) for n in children]
+  return element
+end
+
+function buildRecursively(xmlclade::XMLElement, extensionsArray, ::Nothing)
+  label::String = ""
+  children::Array{XMLElement, 1} = get_elements_by_tagname(xmlclade, "clade")  
+  element::PhyXElement = PhyXElement(label, true, false, PhyXExtension[parsePhyloXML(xmlclade, i) for i in extensionsArray])
+  element.Children = PhyXElement[buildRecursively(n, extensionsArray, element) for n in children]
+  return element
+end
+
+function parsePhyloXML(xmltree::XMLElement, ::Type{PhyXTree}, extensions)
+  # Get the first clade of the tree - the root clade in the XML, the recursiveley build up the tree structure.	
+  # Function assumes a tree is rerootable unless otherwise specified, and assumes it's not rooted unless otherwise specified in the file.
+  # Function also assumes that there is and can only be one name for the tree.
+  XML::XMLElement = get_elements_by_tagname(xmltree, "clade")[1]
+  root::PhyXElement = buildRecursively(XML, extensions, nothing)
+  treename::String = ""
+  rerootable::Bool = true
+  rooted::Bool = false
+  attribute(xmltree, "rooted") == "true" ? rooted = true : nothing
+  attribute(xmltree, "rerootable") == "false" ? rerootable = true : nothing
+  name::Array{XMLElement, 1} = get_elements_by_tagname(xmltree, "name")
+  length(name) == 1 ? treename = content(name[1]) : nothing
+  return PhyXTree(treename, root, rooted, rerootable)
+end
+
+function readtree(file::ASCIIString, ::Type{PhyXTree}, Extensions...)
+  treedoc::XMLDocument = parse_file(expanduser(file))
+  phylogenies::Array{XMLElement,1} = get_elements_by_tagname(root(treedoc), "phylogeny")
+  if length(phylogenies) > 1
+    return [parsePhyloXML(i, PhyXTree) for i in phylogenies]
+  else
+    return parsePhyloXML(phylogenies[1], PhyXTree, Extensions)
+  end
+  error("No Trees found in file...")
+end
+
+
+
+
 # Read in a set of trees from a file
 # Returns an array of trees
 function readtree(filepath::ASCIIString, format="nwk")
@@ -483,61 +533,4 @@ macro tr_str(s)
 		tree = treebuild(s)
 		return tree
 	end
-end
-
-
-function recursiveBuild(xmlclade::XMLElement, cladeArray::Array{PhyXElement, 1}, currentClade::nodeTracker, parentClade::Int, extensionsArray)
-  # Update the node tracker.
-  currentClade.nodeIndex += 1
-  current::Int = currentClade.nodeIndex # Initialize a local variable called current, taken from the currentClade variable to keep as the variable to pass to furthur recursive calls as the parent index.
-  # Get name of clade element.
-  label::String = ""
-  isroot::Bool = parentClade == 0 ? true : false
-  children::Array{XMLElement, 1} = get_elements_by_tagname(xmlclade, "clade")
-  istip::Bool = length(children) == 0 ? true : false
-  
-  # Form the clade object.
-  cladeArray[currentClade.nodeIndex] = PhyXElement(PhyXElementBase(label, isroot, istip, parentClade), PhyXExtension[readPhyXML(xmlclade, i) for i in extensionsArray])
-  # Make the clade object by correctly calling the constructor.
-  for i in children
-    recursiveBuild(i, cladeArray, currentClade, current, extensionsArray)
-  end
-end
-
-function readPhyXML(xmltree::XMLElement, ::Type{PhyXTree}, extensions)
-  treestring::ASCIIString = replace(string(xmltree), r"(\r|\n|\t)", "")
-  treestring2::ASCIIString = replace(treestring, r"(\s{2,})", "")
-  tstable::Array{SubString{ASCIIString}, 1} = split(treestring2, "><")
-  startclade::Int = 0
-  endclade::Int = 0
-  for i in tstable
-    if i == "clade"
-      startclade += 1
-    end
-    if i == "/clade"
-      endclade += 1
-    end
-  end
-  startclade != endclade ? println("Warning! There are unequal numbers of clade begins and clade ends in this tree") : println("Current tree has $startclade clade nodes")
-  # Ok the number of nodes has been established.
-  Clade::Array{PhyXElement, 1} = Array(PhyXElement, startclade)    # Make an array to contain the Clade elements.
-  BackTrack::Array{Int, 1} = zeros(Int, startclade)      # Make an array which tracks the parent of a Clade, to allow backtracking.
-  Current::nodeTracker = nodeTracker(0)                    # Start the nodetracker type.
-  BackTrack[1] = 0
-  XML::XMLElement = get_elements_by_tagname(xmltree, "clade")[1]
-  recursiveBuild(XML, Clade, Current, 0, extensions)
-  treename::String = ""
-  isrooted::Bool = false
-  return PhyXTree(treename, Clade, isrooted)
-end
-
-function readtree(file::ASCIIString, ::Type{PhyXTree}, Extensions...)
-  treedoc::XMLDocument = parse_file(expanduser(file))
-  phylogenies::Array{XMLElement,1} = get_elements_by_tagname(root(treedoc), "phylogeny")
-  if length(phylogenies) > 1
-    return [readPhyXML(i, PhyXTree) for i in phylogenies]
-  else
-    return readPhyXML(phylogenies[1], PhyXTree, Extensions)
-  end
-  println("No Trees found in file...")
 end

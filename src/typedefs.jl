@@ -1,3 +1,38 @@
+## Recurvive extendible type for representation of phylogenetic trees in in Julia. 
+
+type PhyXExtension{T}
+  value::T
+end
+
+type PhyXElement
+  Label::String
+  Root::Bool
+  Tip::Bool
+  Extensions::Array{PhyXExtension}
+  Parent::PhyXElement
+  Children::Array{PhyXElement}
+
+  PhyXElement(label::String, root::Bool, tip::Bool, ext::Array{PhyXExtension, 1}) = new(label, root, tip, ext)
+end
+
+function PhyXElement(label::String, root::Bool, tip::Bool, ext::Array{PhyXExtension, 1}, parent::PhyXElement)
+  x = PhyXElement(label, root, tip, ext)
+  x.Parent = parent
+  return x
+end
+
+type PhyXTree
+  Name::String
+  Root::PhyXElement
+  Rooted::Bool
+  Rerootable::Bool
+end
+
+
+
+
+
+
 # Abstract type definition for Phylogenetic trees.
 abstract Phylogeny
 
@@ -52,38 +87,6 @@ function ReducedTopology(phy::Array{Phylogeny})
 	end
 	return outarray
 end
-
-
-type PhyXElementBase
-  Label::String
-  Root::Bool
-  Tip::Bool
-  Parent::Int
-
-  PhyXElementBase(lab::String, isroot::Bool, istip::Bool, parent::Int64) = new(lab, isroot, istip, parent)
-end
-
-type PhyXExtension{T}
-  value::T
-end
-
-type PhyXElement
-  Base::PhyXElementBase
-  Extensions::Array{PhyXExtension}
-
-  PhyXElement(base::PhyXElementBase, ext::Array{PhyXExtension, 1}) = new(base, ext)
-end
-
-type PhyXTree
-  Name::String
-  Clades::Array{PhyXElement}
-  Rooted::Bool
-end
-
-type nodeTracker
-  nodeIndex::Int
-end
-
 
 # equality, etc.
 
