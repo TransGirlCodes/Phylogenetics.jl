@@ -1,4 +1,4 @@
-## Recurvive extendible type for representation of phylogenetic trees in in Julia. 
+## Recurvive extendible type for representation of phylogenetic trees in in Julia.
 
 type PhyXExtension{T}
   value::T
@@ -27,11 +27,6 @@ type PhyXTree
   Rooted::Bool
   Rerootable::Bool
 end
-
-
-
-
-
 
 # Abstract type definition for Phylogenetic trees.
 abstract Phylogeny
