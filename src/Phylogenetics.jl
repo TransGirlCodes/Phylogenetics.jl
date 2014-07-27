@@ -1,14 +1,25 @@
 module Phylo
-	## Dependencies - Base and Core are implictly imported!
-  using LightXML
-  import DataStructures: Queue, enqueue!, dequeue!, Stack
 
   ## Exported Methods and Types
-	export PhyXExtension,
-		PhyXElement,
-		PhyXTree,
+  export PhyExtension,
+    PhyNode,
+    Phylogeny,
+    getName,
+    getBranchLength,
+    isLeaf,
+    hasChildren,
+    parentIsSelf,
+    hasParent,
+    getChildren,
+    getSiblings,
+    getParent,
+    isRoot,
+    isNode,
+    setName!,
+    setBranchLength!,
+    graft!,
+    prune!
 
-	## Load Package Files
-	include(Pkg.dir("Phylogenetics", "src", "typedefs.jl"))
-	include(Pkg.dir("Phylogenetics", "src", "treeio.jl"))
+  ## Load Package Files
+  include(Pkg.dir("Bio", "src", "phylo", "typedefs.jl"))
 end
