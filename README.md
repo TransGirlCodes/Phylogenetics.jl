@@ -17,4 +17,11 @@ So Phylogenetics.jl is dead, long live Phylo in Bio.jl!
 If you're a Biologist looking for Phylogenetics or Sequence tools in the Julia
 language, come give us a visit at BioJulia!
 
-<p align="center"><img src="https://raw.githubusercontent.com/BioJulia/assets/master/branding/bio.jl.png" width="25%" alt="Bio.jl" /><img src="https://avatars3.githubusercontent.com/u/6486271?v=3&s=200" /></p>
+<p align="center">
+<a href="https://github.com/BioJulia/Bio.jl">
+<img src="https://raw.githubusercontent.com/BioJulia/assets/master/branding/bio.jl.png" width="25%" alt="Bio.jl" />
+</a>
+<a href="https://github.com/BioJulia">
+<img src="https://avatars3.githubusercontent.com/u/6486271?v=3&s=200" />
+</a>
+</p>
