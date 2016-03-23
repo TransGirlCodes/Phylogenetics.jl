@@ -9,7 +9,8 @@ to the language.
 
 This package and repository is no longer activley developed as Phylogenetics.jl
 
-Instead, I and this project formed part of the BioJulia project, as the Phylo module
+I joined several others to form the BioJulia project. All code in Phylogenetics.jl
+was contributed to the package, and after iterations and changes, became the Phylo module
 of the Bio.jl package.
 
 So Phylogenetics.jl is dead, long live Phylo in Bio.jl!
